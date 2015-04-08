@@ -53,6 +53,11 @@ foreach ($adapter in $ActiveNetcfg)
 
 Set-Attr $result.ansible_facts "ansible_interfaces" $formattednetcfg
 
+$applications = @{}
+$raw_applications = Get-WmiObject -Class Win32_Product | Select-Object -Property Name,Version,Vendor,Caption,IdentifyingNumber
+$raw_applications | foreach { $applications.Add(($_.Name -replace " ", "_"), $_) }
+Set-Attr $result.ansible_facts "ansible_win32_products" $applications
+
 Set-Attr $result.ansible_facts "ansible_hostname" $env:COMPUTERNAME;
 Set-Attr $result.ansible_facts "ansible_fqdn" "$([System.Net.Dns]::GetHostByName((hostname)).HostName)"
 Set-Attr $result.ansible_facts "ansible_system" $osversion.Platform.ToString()
